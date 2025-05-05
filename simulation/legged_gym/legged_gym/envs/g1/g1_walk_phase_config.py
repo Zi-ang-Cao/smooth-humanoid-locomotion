@@ -61,25 +61,30 @@ class G1WalkPhaseCfg(HumanoidCfg):
         }
     
     class control(HumanoidCfg.control):
-        stiffness = {'hip_yaw': 150,
-                     'hip_roll': 150,
-                     'hip_pitch': 200,
-                     'knee': 200,
-                     'ankle': 20,
-                     'torso': 200,
-                     'shoulder': 40,
-                     'elbow': 40,
-                     }  # [N*m/rad]
-        damping = {  'hip_yaw': 5,
-                     'hip_roll': 5,
-                     'hip_pitch': 5,
-                     'knee': 5,
-                     'ankle': 4,
-                     'torso': 5,
-                     'shoulder': 10,
-                     'elbow': 10,
-                     }  # [N*m/rad]  # [N*m*s/rad]
-        
+        stiffness = {
+            'hip_pitch': 100,
+            'hip_yaw': 100,
+            'hip_roll': 100,
+            'knee': 150,
+            'ankle': 40,
+
+            'torso': 150,
+
+            'shoulder': 40,
+            'elbow': 50,
+        }  # [N*m/rad]
+        damping = {
+            'hip_pitch': 2,
+            'hip_yaw': 2,
+            'hip_roll': 2,
+            'knee': 4,
+            'ankle': 2,
+
+            'torso': 4,
+            
+            'shoulder': 5,
+            'elbow': 2,
+        }  # [N*m/rad]  # [N*m*s/rad]
         action_scale = 0.5
         decimation = 20
     
@@ -212,6 +217,8 @@ class G1WalkPhaseCfg(HumanoidCfg):
 
         action_delay = (True and domain_rand_general)
         action_buf_len = 8
+
+        action_delay_start_steps = 20E3
     
     class noise(HumanoidCfg.noise):
         add_noise = True
@@ -225,7 +232,7 @@ class G1WalkPhaseCfg(HumanoidCfg):
             imu = 0.05
         
     class commands:
-        curriculum = False
+        curriculum = True
         num_commands = 3
         resampling_time = 3. # time before command are changed[s]
 
@@ -243,11 +250,11 @@ class G1WalkPhaseCfgPPO(HumanoidCfgPPO):
         policy_class_name = 'ActorCriticRMA'
         algorithm_class_name = 'PPORMA'
         runner_class_name = 'OnPolicyRunner'
-        max_iterations = 20001 # number of policy updates
+        max_iterations = int(200E3+1) # number of policy updates
 
         # logging
         save_interval = 100 # check for potential saves every this many iterations
-        experiment_name = 'test'
+        experiment_name = 'test_curriculum_cmd_with_no_delay'
         run_name = ''
         # load and resume
         resume = False
